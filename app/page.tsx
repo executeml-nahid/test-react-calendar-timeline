@@ -1,168 +1,34 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import moment from "moment";
 import { useState } from "react";
 import Timeline, { DateHeader, SidebarHeader, TimelineHeaders } from "react-calendar-timeline";
 import "react-calendar-timeline/dist/style.css";
+import {
+  FaPaintBrush,
+  FaMobile,
+  FaBolt,
+  FaDatabase,
+  FaBullseye,
+  FaPalette,
+  FaCheckCircle,
+  FaFlask,
+  FaRocket,
+  FaBullhorn,
+  FaUser,
+  FaTasks,
+} from "react-icons/fa";
+import CustomTimelineItem, { TimelineItem } from "../components/CustomTimelineItem";
 
 const initialStyles = {
   borderRadius: `3rem`,
   paddingLeft: "10px",
 };
 
-// Define types for timeline items
-interface TimelineItem {
-  id: number;
-  group: number;
-  title: string;
-  description: string;
-  start_time: moment.Moment;
-  end_time: moment.Moment;
-  progress?: number;
-  assignee?: string;
-  emoji?: string;
-  status?: string;
-  itemProps?: {
-    style?: React.CSSProperties;
-  };
-}
-
 interface TimelineGroup {
   id: number;
   title: string;
 }
-
-// Custom Timeline Item Component
-const CustomTimelineItem = ({ item, getItemProps, getResizeProps }: {
-  item: TimelineItem;
-  getItemProps: (config: any) => any;
-  getResizeProps: () => { left: any; right: any };
-}) => {
-  const { left: leftResizeProps, right: rightResizeProps } = getResizeProps();
-
-  return (
-    <div
-      {...getItemProps({
-        style: {
-          ...item.itemProps?.style,
-          padding: "8px 12px",
-          borderRadius: "8px",
-          border: "1px solid rgba(255,255,255,0.2)",
-          boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
-          minHeight: "45px",
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "center",
-          position: "relative",
-          overflow: "hidden",
-        },
-      })}
-    >
-      {leftResizeProps && <div {...leftResizeProps} />}
-
-      {/* Progress bar background */}
-      {item.progress !== undefined && (
-        <div
-          style={{
-            position: "absolute",
-            bottom: 0,
-            left: 0,
-            right: 0,
-            height: "3px",
-            backgroundColor: "rgba(255,255,255,0.2)",
-            borderRadius: "0 0 8px 8px",
-          }}
-        >
-          <div
-            style={{
-              height: "100%",
-              width: `${item.progress}%`,
-              backgroundColor: item.progress >= 100 ? "#10B981" : "#3B82F6",
-              borderRadius: "0 0 8px 8px",
-              transition: "width 0.3s ease",
-            }}
-          />
-        </div>
-      )}
-
-      {/* Main content */}
-      <div style={{ display: "flex", alignItems: "flex-start", gap: "6px", flex: 1 }}>
-        {/* Emoji/Icon */}
-        {item.emoji && <span style={{ fontSize: "14px", lineHeight: "1" }}>{item.emoji}</span>}
-
-        {/* Content */}
-        <div style={{ flex: 1, minWidth: 0 }}>
-          {/* Title */}
-          <div
-            style={{
-              fontSize: "12px",
-              fontWeight: "600",
-              lineHeight: "1.2",
-              marginBottom: "2px",
-              color: item.itemProps?.style?.color || "#000",
-              overflow: "hidden",
-              textOverflow: "ellipsis",
-              whiteSpace: "nowrap",
-            }}
-          >
-            {item.title}
-          </div>
-
-          {/* Progress percentage */}
-          {item.progress !== undefined && (
-            <div
-              style={{
-                fontSize: "10px",
-                color: item.itemProps?.style?.color || "#000",
-                opacity: 0.8,
-                lineHeight: "1.2",
-              }}
-            >
-              {item.progress}% complete
-            </div>
-          )}
-
-          {/* Assignee */}
-          {item.assignee && (
-            <div
-              style={{
-                fontSize: "10px",
-                color: item.itemProps?.style?.color || "#000",
-                opacity: 0.9,
-                lineHeight: "1.2",
-                display: "flex",
-                alignItems: "center",
-                gap: "3px",
-              }}
-            >
-              <span>👤</span>
-              <span>{item.assignee}</span>
-            </div>
-          )}
-        </div>
-
-        {/* Status indicator */}
-        {item.status && (
-          <div
-            style={{
-              fontSize: "10px",
-              padding: "2px 4px",
-              borderRadius: "4px",
-              backgroundColor: "rgba(255,255,255,0.2)",
-              color: item.itemProps?.style?.color || "#000",
-              lineHeight: "1",
-            }}
-          >
-            {item.status}
-          </div>
-        )}
-      </div>
-
-      {rightResizeProps && <div {...rightResizeProps} />}
-    </div>
-  );
-};
 
 const ProjectTimeline = () => {
   const today = moment();
@@ -211,7 +77,7 @@ const ProjectTimeline = () => {
       end_time: today.clone().add(3, "day"),
       progress: 75,
       assignee: "Sarah Johnson",
-      emoji: "🎨",
+      icon: FaPaintBrush,
       status: "In Progress",
       itemProps: {
         style: {
@@ -230,7 +96,7 @@ const ProjectTimeline = () => {
       end_time: today.clone().add(10, "day"),
       progress: 0,
       assignee: "Mike Chen",
-      emoji: "📱",
+      icon: FaMobile,
       status: "Planned",
       itemProps: {
         style: {
@@ -249,7 +115,7 @@ const ProjectTimeline = () => {
       end_time: today.clone().add(7, "day"),
       progress: 60,
       assignee: "Alex Rodriguez",
-      emoji: "⚡",
+      icon: FaBolt,
       status: "Active",
       itemProps: {
         style: {
@@ -268,7 +134,7 @@ const ProjectTimeline = () => {
       end_time: today.clone().add(12, "day"),
       progress: 25,
       assignee: "David Kim",
-      emoji: "🗄️",
+      icon: FaDatabase,
       status: "Planning",
       itemProps: {
         style: {
@@ -287,7 +153,7 @@ const ProjectTimeline = () => {
       end_time: today.clone().add(2, "day"),
       progress: 90,
       assignee: "Emma Wilson",
-      emoji: "🎯",
+      icon: FaBullseye,
       status: "Review",
       itemProps: {
         style: {
@@ -306,7 +172,7 @@ const ProjectTimeline = () => {
       end_time: today.clone().add(8, "day"),
       progress: 10,
       assignee: "Lisa Park",
-      emoji: "🎨",
+      icon: FaPalette,
       status: "Starting",
       itemProps: {
         style: {
@@ -326,7 +192,7 @@ const ProjectTimeline = () => {
       end_time: today.clone().add(4, "day"),
       progress: 100,
       assignee: "James Taylor",
-      emoji: "✅",
+      icon: FaCheckCircle,
       status: "Complete",
       itemProps: {
         style: {
@@ -345,7 +211,7 @@ const ProjectTimeline = () => {
       end_time: today.clone().add(11, "day"),
       progress: 5,
       assignee: "Anna Davis",
-      emoji: "🧪",
+      icon: FaFlask,
       status: "Prep",
       itemProps: {
         style: {
@@ -364,7 +230,7 @@ const ProjectTimeline = () => {
       end_time: today.clone().add(6, "day"),
       progress: 40,
       assignee: "Tom Wilson",
-      emoji: "🚀",
+      icon: FaRocket,
       status: "Active",
       itemProps: {
         style: {
@@ -383,7 +249,7 @@ const ProjectTimeline = () => {
       end_time: today.clone().add(14, "day"),
       progress: 15,
       assignee: "Rachel Green",
-      emoji: "📢",
+      icon: FaBullhorn,
       status: "Planning",
       itemProps: {
         style: {
@@ -521,7 +387,7 @@ const ProjectTimeline = () => {
               <span className="text-sm text-slate-600 dark:text-slate-300">Progress Bar</span>
             </div>
             <div className="flex items-center gap-2">
-              <span className="text-lg">👤</span>
+              <FaUser className="text-slate-600 dark:text-slate-300" size={16} />
               <span className="text-sm text-slate-600 dark:text-slate-300">Assignee</span>
             </div>
             <div className="flex items-center gap-2">
@@ -529,7 +395,7 @@ const ProjectTimeline = () => {
               <span className="text-sm text-slate-600 dark:text-slate-300">Task Status</span>
             </div>
             <div className="flex items-center gap-2">
-              <span className="text-lg">🎨</span>
+              <FaTasks className="text-slate-600 dark:text-slate-300" size={16} />
               <span className="text-sm text-slate-600 dark:text-slate-300">Task Type Icon</span>
             </div>
           </div>
