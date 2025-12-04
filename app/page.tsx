@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import moment from "moment";
@@ -10,11 +11,164 @@ const initialStyles = {
   paddingLeft: "10px",
 };
 
+// Define types for timeline items
+interface TimelineItem {
+  id: number;
+  group: number;
+  title: string;
+  description: string;
+  start_time: moment.Moment;
+  end_time: moment.Moment;
+  progress?: number;
+  assignee?: string;
+  emoji?: string;
+  status?: string;
+  itemProps?: {
+    style?: React.CSSProperties;
+  };
+}
+
+interface TimelineGroup {
+  id: number;
+  title: string;
+}
+
+// Custom Timeline Item Component
+const CustomTimelineItem = ({ item, getItemProps, getResizeProps }: {
+  item: TimelineItem;
+  getItemProps: (config: any) => any;
+  getResizeProps: () => { left: any; right: any };
+}) => {
+  const { left: leftResizeProps, right: rightResizeProps } = getResizeProps();
+
+  return (
+    <div
+      {...getItemProps({
+        style: {
+          ...item.itemProps?.style,
+          padding: "8px 12px",
+          borderRadius: "8px",
+          border: "1px solid rgba(255,255,255,0.2)",
+          boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+          minHeight: "45px",
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "center",
+          position: "relative",
+          overflow: "hidden",
+        },
+      })}
+    >
+      {leftResizeProps && <div {...leftResizeProps} />}
+
+      {/* Progress bar background */}
+      {item.progress !== undefined && (
+        <div
+          style={{
+            position: "absolute",
+            bottom: 0,
+            left: 0,
+            right: 0,
+            height: "3px",
+            backgroundColor: "rgba(255,255,255,0.2)",
+            borderRadius: "0 0 8px 8px",
+          }}
+        >
+          <div
+            style={{
+              height: "100%",
+              width: `${item.progress}%`,
+              backgroundColor: item.progress >= 100 ? "#10B981" : "#3B82F6",
+              borderRadius: "0 0 8px 8px",
+              transition: "width 0.3s ease",
+            }}
+          />
+        </div>
+      )}
+
+      {/* Main content */}
+      <div style={{ display: "flex", alignItems: "flex-start", gap: "6px", flex: 1 }}>
+        {/* Emoji/Icon */}
+        {item.emoji && <span style={{ fontSize: "14px", lineHeight: "1" }}>{item.emoji}</span>}
+
+        {/* Content */}
+        <div style={{ flex: 1, minWidth: 0 }}>
+          {/* Title */}
+          <div
+            style={{
+              fontSize: "12px",
+              fontWeight: "600",
+              lineHeight: "1.2",
+              marginBottom: "2px",
+              color: item.itemProps?.style?.color || "#000",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              whiteSpace: "nowrap",
+            }}
+          >
+            {item.title}
+          </div>
+
+          {/* Progress percentage */}
+          {item.progress !== undefined && (
+            <div
+              style={{
+                fontSize: "10px",
+                color: item.itemProps?.style?.color || "#000",
+                opacity: 0.8,
+                lineHeight: "1.2",
+              }}
+            >
+              {item.progress}% complete
+            </div>
+          )}
+
+          {/* Assignee */}
+          {item.assignee && (
+            <div
+              style={{
+                fontSize: "10px",
+                color: item.itemProps?.style?.color || "#000",
+                opacity: 0.9,
+                lineHeight: "1.2",
+                display: "flex",
+                alignItems: "center",
+                gap: "3px",
+              }}
+            >
+              <span>👤</span>
+              <span>{item.assignee}</span>
+            </div>
+          )}
+        </div>
+
+        {/* Status indicator */}
+        {item.status && (
+          <div
+            style={{
+              fontSize: "10px",
+              padding: "2px 4px",
+              borderRadius: "4px",
+              backgroundColor: "rgba(255,255,255,0.2)",
+              color: item.itemProps?.style?.color || "#000",
+              lineHeight: "1",
+            }}
+          >
+            {item.status}
+          </div>
+        )}
+      </div>
+
+      {rightResizeProps && <div {...rightResizeProps} />}
+    </div>
+  );
+};
+
 const ProjectTimeline = () => {
   const today = moment();
 
   // Sample groups representing teams
-  const groups = [
+  const groups: TimelineGroup[] = [
     { id: 1, title: "Frontend Team" },
     { id: 2, title: "Backend Team" },
     { id: 3, title: "Design Team" },
@@ -45,8 +199,8 @@ const ProjectTimeline = () => {
     { background: "#33FFFF", text: "black" },
   ];
 
-  // Sample items representing tasks/projects
-  const itemsWithPredefinedColors = [
+  // Sample items representing tasks/projects with enhanced data
+  const itemsWithPredefinedColors: TimelineItem[] = [
     {
       id: 1,
       group: 1,
@@ -55,6 +209,10 @@ const ProjectTimeline = () => {
         "Complete overhaul of the company homepage with modern design principles and improved user experience",
       start_time: today.clone().subtract(2, "day"),
       end_time: today.clone().add(3, "day"),
+      progress: 75,
+      assignee: "Sarah Johnson",
+      emoji: "🎨",
+      status: "In Progress",
       itemProps: {
         style: {
           ...initialStyles,
@@ -70,6 +228,10 @@ const ProjectTimeline = () => {
       description: "Optimize website performance and responsiveness for mobile devices across all browsers",
       start_time: today.clone().add(5, "day"),
       end_time: today.clone().add(10, "day"),
+      progress: 0,
+      assignee: "Mike Chen",
+      emoji: "📱",
+      status: "Planned",
       itemProps: {
         style: {
           ...initialStyles,
@@ -85,6 +247,10 @@ const ProjectTimeline = () => {
       description: "Build RESTful API endpoints with proper authentication, validation, and documentation",
       start_time: today.clone().subtract(1, "day"),
       end_time: today.clone().add(7, "day"),
+      progress: 60,
+      assignee: "Alex Rodriguez",
+      emoji: "⚡",
+      status: "Active",
       itemProps: {
         style: {
           ...initialStyles,
@@ -100,6 +266,10 @@ const ProjectTimeline = () => {
       description: "Migrate legacy database to new schema with zero downtime deployment strategy",
       start_time: today.clone().add(8, "day"),
       end_time: today.clone().add(12, "day"),
+      progress: 25,
+      assignee: "David Kim",
+      emoji: "🗄️",
+      status: "Planning",
       itemProps: {
         style: {
           ...initialStyles,
@@ -115,6 +285,10 @@ const ProjectTimeline = () => {
       description: "Design and develop reusable UI components library with consistent styling and interactions",
       start_time: today.clone().subtract(3, "day"),
       end_time: today.clone().add(2, "day"),
+      progress: 90,
+      assignee: "Emma Wilson",
+      emoji: "🎯",
+      status: "Review",
       itemProps: {
         style: {
           ...initialStyles,
@@ -130,6 +304,10 @@ const ProjectTimeline = () => {
       description: "Establish comprehensive brand guidelines including colors, typography, and visual identity",
       start_time: today.clone().add(3, "day"),
       end_time: today.clone().add(8, "day"),
+      progress: 10,
+      assignee: "Lisa Park",
+      emoji: "🎨",
+      status: "Starting",
       itemProps: {
         style: {
           ...initialStyles,
@@ -146,6 +324,10 @@ const ProjectTimeline = () => {
         "Comprehensive testing of homepage redesign including unit tests, integration tests, and user acceptance testing",
       start_time: today.clone().subtract(1, "day"),
       end_time: today.clone().add(4, "day"),
+      progress: 100,
+      assignee: "James Taylor",
+      emoji: "✅",
+      status: "Complete",
       itemProps: {
         style: {
           ...initialStyles,
@@ -161,6 +343,10 @@ const ProjectTimeline = () => {
       description: "End-to-end testing of mobile optimization and API integration with performance benchmarking",
       start_time: today.clone().add(5, "day"),
       end_time: today.clone().add(11, "day"),
+      progress: 5,
+      assignee: "Anna Davis",
+      emoji: "🧪",
+      status: "Prep",
       itemProps: {
         style: {
           ...initialStyles,
@@ -169,9 +355,47 @@ const ProjectTimeline = () => {
         },
       },
     },
+    {
+      id: 9,
+      group: 5,
+      title: "CI/CD Pipeline Setup",
+      description: "Configure automated deployment pipeline with testing and security checks",
+      start_time: today.clone().add(1, "day"),
+      end_time: today.clone().add(6, "day"),
+      progress: 40,
+      assignee: "Tom Wilson",
+      emoji: "🚀",
+      status: "Active",
+      itemProps: {
+        style: {
+          ...initialStyles,
+          background: predefinedColors[8 % predefinedColors.length].background,
+          color: predefinedColors[8 % predefinedColors.length].text,
+        },
+      },
+    },
+    {
+      id: 10,
+      group: 6,
+      title: "Product Launch Campaign",
+      description: "Multi-channel marketing campaign for product launch with social media and email marketing",
+      start_time: today.clone().add(7, "day"),
+      end_time: today.clone().add(14, "day"),
+      progress: 15,
+      assignee: "Rachel Green",
+      emoji: "📢",
+      status: "Planning",
+      itemProps: {
+        style: {
+          ...initialStyles,
+          background: predefinedColors[9 % predefinedColors.length].background,
+          color: predefinedColors[9 % predefinedColors.length].text,
+        },
+      },
+    },
   ];
 
-  const [items, setItems] = useState(itemsWithPredefinedColors);
+  const [items, setItems] = useState<TimelineItem[]>(itemsWithPredefinedColors);
   const [visibleTimeStart, setVisibleTimeStart] = useState(today.clone().subtract(5, "day").valueOf());
   const [visibleTimeEnd, setVisibleTimeEnd] = useState(today.clone().add(15, "day").valueOf());
 
@@ -185,7 +409,7 @@ const ProjectTimeline = () => {
     setVisibleTimeEnd(visibleTimeEnd);
   };
 
-  const handleItemMove = (itemId: number, dragTime: number, newGroupOrder: number) => {
+  const handleItemMove = (itemId: number, dragTime: number, newGroupOrder: number): void => {
     const item = items.find((i) => i.id === itemId);
     if (!item) return;
 
@@ -203,7 +427,7 @@ const ProjectTimeline = () => {
     setItems(updatedItems);
   };
 
-  const handleItemResize = (itemId: number, time: number, edge: string) => {
+  const handleItemResize = (itemId: number, time: number, edge: "left" | "right"): void => {
     const updatedItems = items.map((i) =>
       i.id === itemId
         ? {
@@ -216,7 +440,7 @@ const ProjectTimeline = () => {
     setItems(updatedItems);
   };
 
-  const handleCanvasClick = (groupId: number, time: number) => {
+  const handleCanvasClick = (groupId: number, time: number): void => {
     console.log(`Clicked on group ${groupId} at time ${moment(time).format()}`);
   };
 
@@ -266,6 +490,7 @@ const ProjectTimeline = () => {
                 month: 1,
                 year: 1,
               }}
+              itemRenderer={CustomTimelineItem}
             >
               <TimelineHeaders>
                 <SidebarHeader>
@@ -288,6 +513,41 @@ const ProjectTimeline = () => {
         </div>
 
         {/* Legend */}
+        <div className="bg-white dark:bg-slate-800 rounded-lg shadow-lg p-6 mt-6">
+          <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-4">Timeline Legend</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="flex items-center gap-2">
+              <div className="w-4 h-1 bg-blue-500 rounded"></div>
+              <span className="text-sm text-slate-600 dark:text-slate-300">Progress Bar</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-lg">👤</span>
+              <span className="text-sm text-slate-600 dark:text-slate-300">Assignee</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="px-2 py-1 bg-slate-100 dark:bg-slate-700 rounded text-xs">Status</div>
+              <span className="text-sm text-slate-600 dark:text-slate-300">Task Status</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-lg">🎨</span>
+              <span className="text-sm text-slate-600 dark:text-slate-300">Task Type Icon</span>
+            </div>
+          </div>
+
+          <div className="mt-4 pt-4 border-t border-slate-200 dark:border-slate-600">
+            <h4 className="text-sm font-medium text-slate-900 dark:text-white mb-2">Progress Status Colors:</h4>
+            <div className="flex gap-4">
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 bg-blue-500 rounded"></div>
+                <span className="text-xs text-slate-600 dark:text-slate-300">In Progress</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 bg-green-500 rounded"></div>
+                <span className="text-xs text-slate-600 dark:text-slate-300">Complete</span>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
